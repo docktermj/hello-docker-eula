@@ -9,10 +9,10 @@ RUN apk update \
  && apk add \
       bash
 
-# Copy the repository from the local host.
+# Copy the repository's "app" directory from the local host.
 
-COPY . /hello-docker-eula
+COPY ./app /app
 
 # At runtime, run the following:
 
-CMD /bin/bash
+CMD /app/accept-eula.sh || /app/mock-program.sh

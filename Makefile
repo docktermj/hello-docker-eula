@@ -6,6 +6,7 @@ GIT_VERSION := $(shell git describe --always --tags --long --dirty | sed -e 's/\
 # Docker
 
 DOCKER_IMAGE := $(GIT_REPOSITORY_NAME):$(GIT_VERSION)
+DOCKER_CONTAINER := $(GIT_REPOSITORY_NAME)-$(GIT_VERSION)-container
 
 # -----------------------------------------------------------------------------
 # The first "make" target runs as default.
@@ -27,7 +28,25 @@ build:
 
 .PHONY: run
 run:
-	docker run -it --name "$(DOCKER_IMAGE)-container" $(DOCKER_IMAGE)
+	-docker rm $(DOCKER_CONTAINER)
+	docker run -it \
+	  --name $(DOCKER_CONTAINER) \
+	  $(DOCKER_IMAGE)
+
+.PHONY: test1
+test1:
+	-docker rm $(DOCKER_CONTAINER)
+	docker run \
+	  --name $(DOCKER_CONTAINER) \
+	  $(DOCKER_IMAGE)
+
+.PHONY: test2
+test2:
+	-docker rm $(DOCKER_CONTAINER)
+	docker run \
+	  --env ACCEPT_EULA=Y \
+	  --name $(DOCKER_CONTAINER) \
+	  $(DOCKER_IMAGE)
 
 # -----------------------------------------------------------------------------
 # Utility targets
@@ -36,6 +55,7 @@ run:
 .PHONY: clean
 clean:
 	-docker rmi --force $(DOCKER_IMAGE)
+	-docker rm $(DOCKER_CONTAINER)
 
 .PHONY: help
 help:
