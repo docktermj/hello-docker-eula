@@ -2,8 +2,8 @@
 
 # Determine if End-User License (EULA) has been accepted.
 
-ACCEPTED=1
-NOT_ACCEPTED=0
+ACCEPTED=0
+NOT_ACCEPTED=1
 
 # Check if OS environment variable exists. If not, license has not been accepted
 

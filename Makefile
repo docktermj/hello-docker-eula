@@ -27,33 +27,75 @@ build:
 		.
 
 .PHONY: run
-run:
-	-docker rm $(DOCKER_CONTAINER)
+run: clean-container
 	docker run -it \
 	  --name $(DOCKER_CONTAINER) \
 	  $(DOCKER_IMAGE)
 
-.PHONY: test1
-test1:
-	-docker rm $(DOCKER_CONTAINER)
-	docker run \
-	  --name $(DOCKER_CONTAINER) \
-	  $(DOCKER_IMAGE)
+# -----------------------------------------------------------------------------
+# Positive tests - Mock program should run.
+# -----------------------------------------------------------------------------
 
-.PHONY: test2
-test2:
-	-docker rm $(DOCKER_CONTAINER)
+.PHONY: pos-test-1
+pos-test-1: clean-container
 	docker run \
 	  --env ACCEPT_EULA=Y \
 	  --name $(DOCKER_CONTAINER) \
 	  $(DOCKER_IMAGE)
 
 # -----------------------------------------------------------------------------
+# Negative tests - Mock program should not run.
+# -----------------------------------------------------------------------------
+
+.PHONY: neg-test-1
+neg-test-1: clean-container
+	docker run \
+	  --name $(DOCKER_CONTAINER) \
+	  $(DOCKER_IMAGE)
+
+.PHONY: neg-test-2
+neg-test-2: clean-container
+	docker run -it \
+	  --name $(DOCKER_CONTAINER) \
+	  $(DOCKER_IMAGE)
+
+# -----------------------------------------------------------------------------
+# Break-in test - User should not be able to access container.
+# -----------------------------------------------------------------------------
+
+.PHONY: break-test-1
+break-test-1: clean-container
+	docker run -it \
+	  --env ACCEPT_EULA=Y \
+	  --name $(DOCKER_CONTAINER) \
+	  $(DOCKER_IMAGE) \
+	  /bin/bash
+
+.PHONY: break-test-2
+break-test-2: clean-container
+	docker run -it \
+	  --name $(DOCKER_CONTAINER) \
+	  $(DOCKER_IMAGE) \
+	  /bin/bash
+	  
+.PHONY: break-test-3
+break-test-3: clean-container
+	docker run -it \
+	  --env ACCEPT_EULA=Y \
+	  --name $(DOCKER_CONTAINER) \
+	  --entrypoint /bin/bash \
+	  $(DOCKER_IMAGE)
+
+# -----------------------------------------------------------------------------
 # Utility targets
 # -----------------------------------------------------------------------------
 
+.PHONY: clean-container
+clean-container:
+	-docker rm $(DOCKER_CONTAINER)
+
 .PHONY: clean
-clean:
+clean: clean-container
 	-docker rmi --force $(DOCKER_IMAGE)
 	-docker rm $(DOCKER_CONTAINER)
 

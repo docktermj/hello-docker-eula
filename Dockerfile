@@ -13,6 +13,8 @@ RUN apk update \
 
 COPY ./app /app
 
-# At runtime, run the following:
+# At runtime, run the following.
+# Note: The use of ENTRYPOINT and CMD stiffles over-riding the accept-eula.sh checking.
 
-CMD /app/accept-eula.sh || /app/mock-program.sh
+ENTRYPOINT /app/accept-eula.sh && /app/mock-program.sh
+CMD ""
